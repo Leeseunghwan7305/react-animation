@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React, { useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue } from "framer-motion";
 const Wrapper = styled.div`
   height: 100vh;
   width: 100vw;
@@ -48,15 +48,19 @@ const variant = {
   drag: { backgroundColor: "#ebaeae" },
 };
 function App() {
+  const x = useMotionValue(0);
   const biggerBoxRef = useRef<HTMLDivElement>(null);
+  //motionValue 는 (상태)로 살지 않고있다.
+  // state가 아니다
+  //MotionValue가 바뀌면, 컴포넌트가 재랜더링되지 않는다.
   return (
     <>
       <Wrapper>
         <BiggerBox ref={biggerBoxRef}>
           <Box
             drag
+            dragElastic={0.5}
             dragSnapToOrigin={true}
-            dragElastic={1}
             dragConstraints={biggerBoxRef}
             variants={variant}
             whileDrag="drag"
@@ -64,6 +68,8 @@ function App() {
             whileTap="click"
           ></Box>
         </BiggerBox>
+        <button onClick={() => x.set(200)}>Click me</button>
+        <Box style={{ x }} drag dragSnapToOrigin></Box>
       </Wrapper>
     </>
   );
