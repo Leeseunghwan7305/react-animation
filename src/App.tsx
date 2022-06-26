@@ -1,8 +1,13 @@
 import styled from "styled-components";
-import React, { useRef } from "react";
-import { motion, useMotionValue } from "framer-motion";
+import React, { useEffect, useRef, useTransition } from "react";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  useViewportScroll,
+} from "framer-motion";
 const Wrapper = styled.div`
-  height: 100vh;
+  height: 200vh;
   width: 100vw;
   display: flex;
   justify-content: center;
@@ -50,9 +55,18 @@ const variant = {
 function App() {
   const x = useMotionValue(0);
   const biggerBoxRef = useRef<HTMLDivElement>(null);
+  const rotateZ = useTransform(x, [-800, 800], [-360, 360]);
+  const { scrollY, scrollYProgress } = useViewportScroll();
+  const scroll = useTransform(scrollYProgress, [0, 1], [1, 5]);
   //motionValue 는 (상태)로 살지 않고있다.
   // state가 아니다
   //MotionValue가 바뀌면, 컴포넌트가 재랜더링되지 않는다.
+  useEffect(() => {
+    scrollY.onChange(() => {
+      console.log(scrollY.get(), scrollYProgress.get());
+    });
+  }, [scrollY, scrollYProgress]);
+
   return (
     <>
       <Wrapper>
@@ -69,10 +83,15 @@ function App() {
           ></Box>
         </BiggerBox>
         <button onClick={() => x.set(200)}>Click me</button>
-        <Box style={{ x }} drag dragSnapToOrigin></Box>
+        <Box
+          style={{ x, rotateZ, scale: scroll }}
+          drag="x"
+          dragSnapToOrigin
+        ></Box>
       </Wrapper>
     </>
   );
 }
+//x 축을 수정하겠다.
 
 export default App;
