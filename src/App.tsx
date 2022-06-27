@@ -11,14 +11,13 @@ const Wrapper = styled.div`
   height: 100vh;
   width: 100vw;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   font-weight: 300;
   font-family: "Source Sans Pro", sans-serif;
   color: black;
   line-height: 1.2;
   background: linear-gradient(135deg, #e09, #d0e);
-  flex-direction: column;
 `;
 
 const Box = styled(motion.div)`
@@ -29,16 +28,19 @@ const Box = styled(motion.div)`
   margin-bottom: 20px;
   width: 500px;
   height: 500px;
-  position: absolute;
   top: 50px;
   background-color: rgba(255, 255, 255, 255);
   border-radius: 30px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
-const Button = styled.button`
-  padding: 30px 50px;
-  margin: 5px;
+const Circle = styled(motion.div)`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: skyblue;
+  display: flex;
 `;
+
 // const svg: Variants = {
 //   initial: {
 //     fill: "rgba(255,255,255,0)",
@@ -80,41 +82,24 @@ const list = {
   }),
 };
 function App() {
-  const [visible, setVisible] = useState(1);
-  const [direction, setDirection] = useState(false);
-  //motionValue 는 (상태)로 살지 않고있다.
-  // state가 아니다
-  //MotionValue가 바뀌면, 컴포넌트가 재랜더링되지 않는다.
-  const Next = () => {
-    setDirection(false);
-    setVisible((pre) => (pre == 10 ? 1 : pre + 1));
+  const [clicked, setClicked] = useState(true);
+  const changeLayout = () => {
+    setClicked((pre) => !pre);
   };
-  const Pre = () => {
-    setDirection(true);
-    setVisible((pre) => (pre == 1 ? 10 : pre - 1));
-  };
-  console.log(direction);
   return (
     <>
-      <Wrapper>
-        <AnimatePresence custom={direction}>
-          {
-            <Box
-              custom={direction}
-              variants={list}
-              initial="start"
-              animate="end"
-              exit="leaving"
-              key={visible}
-            >
-              {visible}
-            </Box>
-          }
-        </AnimatePresence>
-        <div>
-          <Button onClick={Pre}>Pre</Button>
-          <Button onClick={Next}>Next</Button>
-        </div>
+      <Wrapper onClick={changeLayout}>
+        <Box>
+          {clicked ? (
+            <Circle style={{ borderRadius: 50 }} layoutId="circle"></Circle>
+          ) : null}
+        </Box>
+
+        <Box>
+          {!clicked ? (
+            <Circle layoutId="circle" style={{ borderRadius: 0 }}></Circle>
+          ) : null}
+        </Box>
       </Wrapper>
     </>
   );
