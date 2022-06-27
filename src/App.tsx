@@ -22,15 +22,22 @@ const Wrapper = styled.div`
 `;
 
 const Box = styled(motion.div)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 5rem;
   margin-bottom: 20px;
   width: 500px;
   height: 500px;
+  position: absolute;
+  top: 50px;
   background-color: rgba(255, 255, 255, 255);
   border-radius: 30px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 const Button = styled.button`
-  padding: 30px;
+  padding: 30px 50px;
+  margin: 5px;
 `;
 // const svg: Variants = {
 //   initial: {
@@ -49,34 +56,65 @@ const Button = styled.button`
 //     },
 //   },
 // };
-const divVariants = {
-  start: { scale: 0, opacity: 0 },
-  end: { scale: 1, opacity: 1, rotateZ: 360 },
-  leaving: { opacity: 0, y: 100 },
+const list = {
+  start: (direction: boolean) => ({
+    x: direction ? -500 : 500,
+    scale: 0,
+    opacity: 0,
+  }),
+  end: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.2,
+    },
+  },
+  leaving: (direction: boolean) => ({
+    x: direction ? 500 : -500,
+    opacity: 0,
+    scale: 0,
+    transition: {
+      duration: 0.3,
+    },
+  }),
 };
 function App() {
-  const [clickToggle, setClickToggle] = useState(false);
-  const ToggleButton = () => {
-    setClickToggle((prev) => !prev);
-  };
+  const [visible, setVisible] = useState(1);
+  const [direction, setDirection] = useState(false);
   //motionValue 는 (상태)로 살지 않고있다.
   // state가 아니다
   //MotionValue가 바뀌면, 컴포넌트가 재랜더링되지 않는다.
-
+  const Next = () => {
+    setDirection(false);
+    setVisible((pre) => (pre == 10 ? 1 : pre + 1));
+  };
+  const Pre = () => {
+    setDirection(true);
+    setVisible((pre) => (pre == 1 ? 10 : pre - 1));
+  };
+  console.log(direction);
   return (
     <>
       <Wrapper>
-        <AnimatePresence>
-          {clickToggle ? (
+        <AnimatePresence custom={direction}>
+          {
             <Box
-              variants={divVariants}
+              custom={direction}
+              variants={list}
               initial="start"
               animate="end"
               exit="leaving"
-            ></Box>
-          ) : null}
+              key={visible}
+            >
+              {visible}
+            </Box>
+          }
         </AnimatePresence>
-        <Button onClick={ToggleButton}>Click me</Button>
+        <div>
+          <Button onClick={Pre}>Pre</Button>
+          <Button onClick={Next}>Next</Button>
+        </div>
       </Wrapper>
     </>
   );
