@@ -7,6 +7,7 @@ import {
   useTransform,
   useViewportScroll,
 } from "framer-motion";
+import { useRecoilBridgeAcrossReactRoots_UNSTABLE } from "recoil";
 const Wrapper = styled.div`
   height: 100vh;
   width: 100vw;
@@ -18,27 +19,6 @@ const Wrapper = styled.div`
   color: black;
   line-height: 1.2;
   background: linear-gradient(135deg, #e09, #d0e);
-`;
-
-const Box = styled(motion.div)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 5rem;
-  margin-bottom: 20px;
-  width: 500px;
-  height: 500px;
-  top: 50px;
-  background-color: rgba(255, 255, 255, 255);
-  border-radius: 30px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-`;
-const Circle = styled(motion.div)`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: skyblue;
-  display: flex;
 `;
 
 // const svg: Variants = {
@@ -58,48 +38,74 @@ const Circle = styled(motion.div)`
 //     },
 //   },
 // };
-const list = {
-  start: (direction: boolean) => ({
-    x: direction ? -500 : 500,
-    scale: 0,
-    opacity: 0,
-  }),
+
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 50vw;
+  gap: 10px;
+  div:first-child,
+  div:last-child {
+    grid-column: span 2;
+  }
+`;
+const Box = styled(motion.div)`
+  border-radius: 40px;
+  height: 200px;
+  background-color: skyblue;
+  box-shadow: 0 2px 3px;
+`;
+const Overlay = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+const Box2 = styled(motion.div)`
+  width: 500px;
+  height: 300px;
+  background-color: white;
+  border-radius: 30px;
+`;
+const OverVar = {
+  start: { backgroundColor: "rgba(0, 0, 0, 0)" },
   end: {
-    x: 0,
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.2,
-    },
+    backgroundColor: "rgba(0, 0, 0, 1)",
+    transition: {},
   },
-  leaving: (direction: boolean) => ({
-    x: direction ? 500 : -500,
-    opacity: 0,
-    scale: 0,
-    transition: {
-      duration: 0.3,
-    },
-  }),
+  leaving: {
+    backgroundColor: "rgba(0, 0, 0, 0)",
+    transition: {},
+  },
 };
 function App() {
-  const [clicked, setClicked] = useState(true);
-  const changeLayout = () => {
-    setClicked((pre) => !pre);
-  };
+  let [layoutId2, setLayoutId] = useState<string | null>(null);
   return (
     <>
-      <Wrapper onClick={changeLayout}>
-        <Box>
-          {clicked ? (
-            <Circle style={{ borderRadius: 50 }} layoutId="circle"></Circle>
+      <Wrapper>
+        <Grid>
+          <Box onClick={() => setLayoutId("1")} layoutId="1"></Box>
+          <Box onClick={() => setLayoutId("2")} layoutId="2"></Box>
+          <Box onClick={() => setLayoutId("3")} layoutId="3"></Box>
+          <Box onClick={() => setLayoutId("4")} layoutId="4"></Box>
+        </Grid>
+        <AnimatePresence>
+          {layoutId2 ? (
+            <Overlay
+              onClick={() => {
+                setLayoutId(null);
+              }}
+              variants={OverVar}
+              initial="start"
+              animate="end"
+              exit="leaving"
+            >
+              <Box2 layoutId={layoutId2 + ""}></Box2>
+            </Overlay>
           ) : null}
-        </Box>
-
-        <Box>
-          {!clicked ? (
-            <Circle layoutId="circle" style={{ borderRadius: 0 }}></Circle>
-          ) : null}
-        </Box>
+        </AnimatePresence>
       </Wrapper>
     </>
   );
